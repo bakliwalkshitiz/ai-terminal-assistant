@@ -30,6 +30,22 @@ async function main() {
     console.log(chalk.yellow("\nAI Suggestion:\n"));
     console.log(aiResponse);
 
+    const response = JSON.parse(aiResponse || "{}");
+
+    console.log(chalk.cyan("\nCommand:"));
+    console.log(response.command);
+
+    console.log(chalk.cyan("\nDescription:"));
+    console.log(response.description);
+
+    console.log(chalk.cyan("\nSafety:"));
+    console.log(response.safety);
+
+    console.log(chalk.cyan("\nRisk:"));
+    console.log(response.risk);
+
+    console.log(chalk.cyan("\nExplanation:"));
+    console.log(response.explanation);
     const confirm = await ask(
       chalk.magenta("\nRun this command? (yes/no): ")
     );
@@ -37,21 +53,22 @@ async function main() {
     if (confirm === "yes") {
       try {
         const blockedCommands = [
-  "del",
-  "format",
-  "shutdown",
-  "rd /s",
-];
+          "del",
+          "format",
+          "shutdown",
+          "rd /s",
+        ];
 
-const isBlocked = blockedCommands.some((cmd) =>
-  aiResponse?.toLowerCase().includes(cmd)
-);
+        const isBlocked = blockedCommands.some((cmd) =>
+          response.command?.toLowerCase().includes(cmd)
+        );
 
-if (isBlocked) {
-  console.log(chalk.red("Dangerous command blocked"));
-  continue;
-}
-        const output = await runCommand(aiResponse || "");
+        if (isBlocked) {
+          console.log(chalk.red("Dangerous command blocked"));
+          continue;
+        }
+
+       const output = await runCommand(response.command || "");
 
         console.log(chalk.green("\nCommand Output:\n"));
         console.log(output);
