@@ -39,7 +39,9 @@ async function main() {
       continue;
     }
 
-    if (
+  if (
+  !response.thought ||
+  typeof response.thought !== "string" ||
   !response.tool ||
   typeof response.tool !== "string" ||
   !response.command ||
@@ -49,6 +51,8 @@ async function main() {
   console.log(chalk.red("\nInvalid AI Response"));
   continue;
 }
+    console.log(chalk.cyan("\nThought:"));
+    console.log(response.thought);
     
     console.log(chalk.cyan("\nTool:"));
     console.log(response.tool);
@@ -92,11 +96,22 @@ async function main() {
 
         let output = "";
 
-if (response.tool === "terminal") {
-  output = await runCommand(response.command);
-} else {
-  console.log(chalk.red("\nUnsupported Tool"));
-  continue;
+switch (response.tool) {
+  case "terminal":
+    output = await runCommand(response.command);
+    break;
+
+  case "browser":
+    console.log(chalk.yellow("\nBrowser Tool Coming Soon"));
+    continue;
+
+  case "file":
+    console.log(chalk.yellow("\nFile Tool Coming Soon"));
+    continue;
+
+  default:
+    console.log(chalk.red("\nUnknown Tool"));
+    continue;
 }
 
         console.log(chalk.green("\nCommand Output:\n"));
