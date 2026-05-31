@@ -30,7 +30,23 @@ async function main() {
     console.log(chalk.yellow("\nAI Suggestion:\n"));
     console.log(aiResponse);
 
-    const response = JSON.parse(aiResponse || "{}");
+    let response;
+
+    try {
+      response = JSON.parse(aiResponse || "{}");
+    } catch {
+      console.log(chalk.red("\nInvalid JSON Response"));
+      continue;
+    }
+
+    if (
+      !response.command ||
+      typeof response.command !== "string" ||
+      response.command.trim() === ""
+    ) {
+      console.log(chalk.red("\nInvalid AI Response"));
+      continue;
+    }
 
     console.log(chalk.cyan("\nCommand:"));
     console.log(response.command);
@@ -46,6 +62,7 @@ async function main() {
 
     console.log(chalk.cyan("\nExplanation:"));
     console.log(response.explanation);
+
     const confirm = await ask(
       chalk.magenta("\nRun this command? (yes/no): ")
     );
@@ -60,7 +77,7 @@ async function main() {
         ];
 
         const isBlocked = blockedCommands.some((cmd) =>
-          response.command?.toLowerCase().includes(cmd)
+          response.command.toLowerCase().includes(cmd)
         );
 
         if (isBlocked) {
@@ -68,7 +85,7 @@ async function main() {
           continue;
         }
 
-       const output = await runCommand(response.command || "");
+        const output = await runCommand(response.command);
 
         console.log(chalk.green("\nCommand Output:\n"));
         console.log(output);
