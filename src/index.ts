@@ -40,13 +40,18 @@ async function main() {
     }
 
     if (
-      !response.command ||
-      typeof response.command !== "string" ||
-      response.command.trim() === ""
-    ) {
-      console.log(chalk.red("\nInvalid AI Response"));
-      continue;
-    }
+  !response.tool ||
+  typeof response.tool !== "string" ||
+  !response.command ||
+  typeof response.command !== "string" ||
+  response.command.trim() === ""
+) {
+  console.log(chalk.red("\nInvalid AI Response"));
+  continue;
+}
+    
+    console.log(chalk.cyan("\nTool:"));
+    console.log(response.tool);
 
     console.log(chalk.cyan("\nCommand:"));
     console.log(response.command);
@@ -85,7 +90,14 @@ async function main() {
           continue;
         }
 
-        const output = await runCommand(response.command);
+        let output = "";
+
+if (response.tool === "terminal") {
+  output = await runCommand(response.command);
+} else {
+  console.log(chalk.red("\nUnsupported Tool"));
+  continue;
+}
 
         console.log(chalk.green("\nCommand Output:\n"));
         console.log(output);
