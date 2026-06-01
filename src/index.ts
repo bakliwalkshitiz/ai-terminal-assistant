@@ -8,6 +8,7 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+const memory: string[] = [];
 
 function ask(question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -20,12 +21,19 @@ async function main() {
 
   while (true) {
     const input = await ask(chalk.blue("You > "));
+    memory.push(input);
+    console.log(chalk.yellow("\nMemory:"));
+console.log(memory);
+
+if (memory.length > 5) {
+  memory.shift();
+}
 
     if (input === "exit") {
       break;
     }
 
-    const aiResponse = await askAI(input);
+    const aiResponse = await askAI(input , memory);
 
     console.log(chalk.yellow("\nAI Suggestion:\n"));
     console.log(aiResponse);

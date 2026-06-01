@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
@@ -7,7 +8,17 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function askAI(prompt: string) {
+export async function askAI(
+  prompt: string,
+  memory: string[]
+) {
+  const memoryContext = memory.join("\n");
+
+  const longTermMemory = fs.readFileSync(
+    "memory.txt",
+    "utf-8"
+  );
+
   const response = await client.chat.completions.create({
     model: "gpt-4.1-mini",
     messages: [
@@ -56,27 +67,23 @@ Rules:
 - Do not guess when the request is unclear.
 - If unsure, return an empty command.
 - Safety, risk and explanation must match the command.
-
-Example:
-
-{
-  "thought": "Need to list files in the current directory.",
-  "tool": "terminal",
-  "command": "dir",
-  "description": "Lists files in current directory",
-  "safety": "safe",
-  "risk": "low",
-  "explanation": "Displays all files and folders in the current directory."
-}
 `,
       },
       {
         role: "user",
-        content: prompt,
+        content: `
+Short-Term Memory:
+${memoryContext}
+
+Long-Term Memory:
+${longTermMemory}
+
+Current User Request:
+${prompt}
+`,
       },
     ],
   });
 
   return response.choices?.[0]?.message.content ?? "";
-  
 }
