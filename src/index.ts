@@ -48,20 +48,29 @@ if (memory.length > 5) {
     }
 
     if (
-      !response.thought ||
-      typeof response.thought !== "string" ||
-      !response.tool ||
-      typeof response.tool !== "string" ||
-      !response.command ||
-      typeof response.command !== "string" ||
-      response.command.trim() === ""
-    ) {
+  !response.thought ||
+  typeof response.thought !== "string" ||
+  !Array.isArray(response.plan) ||
+  !response.tool ||
+  typeof response.tool !== "string" ||
+  !response.command ||
+  typeof response.command !== "string" ||
+  response.command.trim() === ""
+) {
       console.log(chalk.red("\nInvalid AI Response"));
       continue;
     }
 
     console.log(chalk.cyan("\nThought:"));
     console.log(response.thought);
+
+    console.log(chalk.cyan("\nPlan:"));
+
+response.plan.forEach(
+  (step: string, index: number) => {
+    console.log(`${index + 1}. ${step}`);
+  }
+);
 
     console.log(chalk.cyan("\nTool:"));
     console.log(response.tool);
@@ -129,9 +138,17 @@ if (memory.length > 5) {
         console.log(chalk.cyan("\nObservation:"));
         console.log("Command executed successfully.");
       } catch (error) {
-        console.log(chalk.red("\nError:\n"));
-        console.log(error);
-      }
+  console.log(chalk.red("\nError:\n"));
+  console.log(error);
+
+  console.log(chalk.cyan("\nObservation:"));
+  console.log("Command execution failed.");
+
+  console.log(chalk.yellow("\nReflection:"));
+  console.log(
+    "The command failed. Consider checking the path, command syntax, or file existence."
+  );
+}
     }
   }
 

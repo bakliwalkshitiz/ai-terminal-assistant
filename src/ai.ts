@@ -37,6 +37,7 @@ If the user's request is unclear, invalid, meaningless, or cannot be converted i
 
 {
   "thought": "Could not determine a valid action.",
+  "plan": [],
   "tool": "terminal",
   "command": "",
   "description": "Invalid request",
@@ -49,6 +50,7 @@ Format:
 
 {
   "thought": "string",
+  "plan": ["step 1", "step 2"],
   "tool": "terminal|browser|file",
   "command": "string",
   "description": "string",
@@ -67,6 +69,8 @@ Rules:
 - Do not guess when the request is unclear.
 - If unsure, return an empty command.
 - Safety, risk and explanation must match the command.
+- Create a plan before choosing a command.
+- Put the steps in the plan array.
 `,
       },
       {
