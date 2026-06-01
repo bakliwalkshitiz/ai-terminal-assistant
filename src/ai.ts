@@ -91,3 +91,35 @@ ${prompt}
 
   return response.choices?.[0]?.message.content ?? "";
 }
+
+export async function askRAG(
+  question: string,
+  context: string
+) {
+  const response =
+    await client.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Answer only using the provided context.",
+        },
+        {
+          role: "user",
+          content: `
+Context:
+${context}
+
+Question:
+${question}
+`,
+        },
+      ],
+    });
+
+  return (
+    response.choices?.[0]?.message.content ??
+    ""
+  );
+}
