@@ -4,6 +4,8 @@ import chalk from "chalk";
 import { askAI } from "./ai.js";
 import { runCommand } from "./terminal.js";
 
+
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
