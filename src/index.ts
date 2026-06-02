@@ -1,6 +1,6 @@
 import readline from "readline";
 import chalk from "chalk";
-
+import { routeSource } from "./router.js";
 import { askAI } from "./ai.js";
 import { runCommand } from "./terminal.js";
 
@@ -87,21 +87,9 @@ async function main() {
     console.log(chalk.cyan("\nSource:"));
     console.log(response.source);
 
-    if (response.source === "memory") {
-  console.log(chalk.green("\nUsing Memory"));
-}
-
-if (response.source === "rag") {
-  console.log(chalk.green("\nUsing RAG"));
-}
-
-if (response.source === "tool") {
-  console.log(chalk.green("\nUsing Tool"));
-}
-
-if (response.source === "llm") {
-  console.log(chalk.green("\nUsing LLM"));
-}
+    await routeSource(
+  response.source
+);
 
     console.log(chalk.cyan("\nPlan:"));
 
