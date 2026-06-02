@@ -41,6 +41,8 @@ async function main() {
       memory
     );
 
+    
+
     console.log(
       chalk.yellow("\nAI Suggestion:\n")
     );
@@ -84,6 +86,22 @@ async function main() {
 
     console.log(chalk.cyan("\nSource:"));
     console.log(response.source);
+
+    if (response.source === "memory") {
+  console.log(chalk.green("\nUsing Memory"));
+}
+
+if (response.source === "rag") {
+  console.log(chalk.green("\nUsing RAG"));
+}
+
+if (response.source === "tool") {
+  console.log(chalk.green("\nUsing Tool"));
+}
+
+if (response.source === "llm") {
+  console.log(chalk.green("\nUsing LLM"));
+}
 
     console.log(chalk.cyan("\nPlan:"));
 
