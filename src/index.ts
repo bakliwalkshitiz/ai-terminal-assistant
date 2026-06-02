@@ -62,18 +62,17 @@ async function main() {
     }
 
     if (
-      !response.thought ||
-      typeof response.thought !==
-        "string" ||
-      !Array.isArray(response.plan) ||
-      !response.tool ||
-      typeof response.tool !==
-        "string" ||
-      !response.command ||
-      typeof response.command !==
-        "string" ||
-      response.command.trim() === ""
-    ) {
+  !response.thought ||
+  typeof response.thought !== "string" ||
+  !Array.isArray(response.plan) ||
+  !response.source ||
+  typeof response.source !== "string" ||
+  !response.tool ||
+  typeof response.tool !== "string" ||
+  !response.command ||
+  typeof response.command !== "string" ||
+  response.command.trim() === ""
+) {
       console.log(
         chalk.red("\nInvalid AI Response")
       );
@@ -82,6 +81,9 @@ async function main() {
 
     console.log(chalk.cyan("\nThought:"));
     console.log(response.thought);
+
+    console.log(chalk.cyan("\nSource:"));
+    console.log(response.source);
 
     console.log(chalk.cyan("\nPlan:"));
 

@@ -37,6 +37,8 @@ If the user's request is unclear, invalid, meaningless, or cannot be converted i
 
 {
   "thought": "Could not determine a valid action.",
+  "source": "llm",
+  "needRetrieval": false,
   "plan": [],
   "tool": "terminal",
   "command": "",
@@ -50,6 +52,8 @@ Format:
 
 {
   "thought": "string",
+  "source": "memory|rag|tool|llm",
+  "needRetrieval": true,
   "plan": ["step 1", "step 2"],
   "tool": "terminal|browser|file",
   "command": "string",
@@ -62,15 +66,103 @@ Format:
 Rules:
 
 - First think about the user's request.
-- Put your reasoning in the thought field.
-- Choose the most appropriate tool.
+- Create a plan before choosing a command.
+- Put the steps in the plan array.
+- Decide where the final answer or action should come from.
+- Set source to one of:
+
+  memory -> user preferences, stored facts, previous information.
+
+  rag -> documents, notes, PDFs, retrieved knowledge.
+
+  tool -> terminal actions, browser actions, file actions.
+
+  llm -> general knowledge that can be answered directly.
+
+- Choose source based on where the FINAL answer or action comes from.
+- Do NOT choose memory simply because the request appeared in memory.
+- If a terminal command is required, source must be "tool".
+- If a browser action is required, source must be "tool".
+- If a file action is required, source must be "tool".
+- If documents must be searched, source must be "rag".
+- If user preferences or stored facts are needed, source must be "memory".
+- If general knowledge is enough, source must be "llm".
+
+- Decide whether retrieval is needed.
+- Set needRetrieval to true or false.
+
 - Use only Windows CMD commands for terminal actions.
 - Return exactly one command.
 - Do not guess when the request is unclear.
 - If unsure, return an empty command.
+
 - Safety, risk and explanation must match the command.
-- Create a plan before choosing a command.
-- Put the steps in the plan array.
+
+Examples:
+
+User:
+"What is my favorite language?"
+
+{
+  "thought": "Need stored user information.",
+  "source": "memory",
+  "needRetrieval": false,
+  "plan": ["Check memory"],
+  "tool": "terminal",
+  "command": "echo Checking memory",
+  "description": "Answer from memory",
+  "safety": "safe",
+  "risk": "low",
+  "explanation": "The answer should come from stored memory."
+}
+
+User:
+"How does authentication work in my project?"
+
+{
+  "thought": "Need project documentation.",
+  "source": "rag",
+  "needRetrieval": true,
+  "plan": ["Search documents", "Retrieve context"],
+  "tool": "file",
+  "command": "echo Retrieving documents",
+  "description": "Retrieve project information",
+  "safety": "safe",
+  "risk": "low",
+  "explanation": "The answer requires retrieved documents."
+}
+
+User:
+"Create a folder named demo"
+
+{
+  "thought": "The user wants to create a folder.",
+  "source": "tool",
+  "needRetrieval": false,
+  "plan": ["Create folder demo"],
+  "tool": "terminal",
+  "command": "mkdir demo",
+  "description": "Create folder",
+  "safety": "safe",
+  "risk": "low",
+  "explanation": "A terminal command is required."
+}
+
+User:
+"What is the capital of France?"
+
+{
+  "thought": "General knowledge question.",
+  "source": "llm",
+  "needRetrieval": false,
+  "plan": ["Answer directly"],
+  "tool": "terminal",
+  "command": "echo Paris",
+  "description": "Answer general knowledge question",
+  "safety": "safe",
+  "risk": "low",
+  "explanation": "The answer can be generated directly."
+}
 `,
       },
       {
