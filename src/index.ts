@@ -1,8 +1,13 @@
 import readline from "readline";
 import chalk from "chalk";
-import { routeSource } from "./router.js";
+
 import { askAI } from "./ai.js";
+import { routeSource } from "./router.js";
 import { runCommand } from "./terminal.js";
+
+import { retrieve } from "./retrieval.js";
+import { createEmbedding } from "./embedding.js";
+import { vectorStore } from "./vectorStore.js";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -18,30 +23,32 @@ function ask(question: string): Promise<string> {
 }
 
 async function main() {
-  console.log(chalk.green("AI Terminal Assistant Started"));
+  console.log(
+    chalk.green("AI Terminal Assistant Started")
+  );
 
   while (true) {
-    const input = await ask(chalk.blue("You > "));
-
-    memory.push(input);
-
-    console.log(chalk.yellow("\nMemory:"));
-    console.log(memory);
-
-    if (memory.length > 5) {
-      memory.shift();
-    }
+    const input = await ask(
+      chalk.blue("You > ")
+    );
 
     if (input === "exit") {
       break;
     }
 
+    memory.push(input);
+
+    if (memory.length > 5) {
+      memory.shift();
+    }
+
+    console.log(chalk.yellow("\nMemory:"));
+    console.log(memory);
+
     const aiResponse = await askAI(
       input,
       memory
     );
-
-    
 
     console.log(
       chalk.yellow("\nAI Suggestion:\n")
@@ -56,25 +63,18 @@ async function main() {
       );
     } catch {
       console.log(
-        chalk.red(
-          "\nInvalid JSON Response"
-        )
+        chalk.red("\nInvalid JSON Response")
       );
       continue;
     }
 
     if (
-  !response.thought ||
-  typeof response.thought !== "string" ||
-  !Array.isArray(response.plan) ||
-  !response.source ||
-  typeof response.source !== "string" ||
-  !response.tool ||
-  typeof response.tool !== "string" ||
-  !response.command ||
-  typeof response.command !== "string" ||
-  response.command.trim() === ""
-) {
+      !response.thought ||
+      !Array.isArray(response.plan) ||
+      !response.source ||
+      !response.tool ||
+      !response.command
+    ) {
       console.log(
         chalk.red("\nInvalid AI Response")
       );
@@ -88,8 +88,8 @@ async function main() {
     console.log(response.source);
 
     await routeSource(
-  response.source
-);
+      response.source
+    );
 
     console.log(chalk.cyan("\nPlan:"));
 
@@ -107,9 +107,7 @@ async function main() {
     console.log(chalk.cyan("\nTool:"));
     console.log(response.tool);
 
-    console.log(
-      chalk.cyan("\nCommand:")
-    );
+    console.log(chalk.cyan("\nCommand:"));
     console.log(response.command);
 
     console.log(
@@ -134,109 +132,120 @@ async function main() {
       )
     );
 
-    if (confirm === "yes") {
-      try {
-        const blockedCommands = [
-          "del",
-          "format",
-          "shutdown",
-          "rd /s",
-        ];
+    if (confirm !== "yes") {
+      continue;
+    }
 
-        const isBlocked =
-          blockedCommands.some((cmd) =>
+    try {
+      const blockedCommands = [
+        "del",
+        "format",
+        "shutdown",
+        "rd /s",
+      ];
+
+      const isBlocked =
+        blockedCommands.some((cmd) =>
+          response.command
+            .toLowerCase()
+            .includes(cmd)
+        );
+
+      if (isBlocked) {
+        console.log(
+          chalk.red(
+            "Dangerous command blocked"
+          )
+        );
+        continue;
+      }
+
+      let output = "";
+
+      switch (response.tool) {
+        case "terminal":
+          output = await runCommand(
             response.command
-              .toLowerCase()
-              .includes(cmd)
           );
+          break;
 
-        if (isBlocked) {
+        case "browser":
           console.log(
-            chalk.red(
-              "Dangerous command blocked"
+            chalk.yellow(
+              "\nBrowser Tool Coming Soon"
             )
           );
           continue;
-        }
 
-        let output = "";
+        case "file":
+          console.log(
+            chalk.yellow(
+              "\nFile Tool Coming Soon"
+            )
+          );
+          continue;
 
-        switch (response.tool) {
-          case "terminal":
-            output =
-              await runCommand(
-                response.command
-              );
-            break;
-
-          case "browser":
-            console.log(
-              chalk.yellow(
-                "\nBrowser Tool Coming Soon"
-              )
-            );
-            continue;
-
-          case "file":
-            console.log(
-              chalk.yellow(
-                "\nFile Tool Coming Soon"
-              )
-            );
-            continue;
-
-          default:
-            console.log(
-              chalk.red(
-                "\nUnknown Tool"
-              )
-            );
-            continue;
-        }
-
-        console.log(
-          chalk.green(
-            "\nCommand Output:\n"
-          )
-        );
-        console.log(output);
-
-        console.log(
-          chalk.cyan(
-            "\nObservation:"
-          )
-        );
-        console.log(
-          "Command executed successfully."
-        );
-      } catch (error) {
-        console.log(
-          chalk.red("\nError:\n")
-        );
-        console.log(error);
-
-        console.log(
-          chalk.cyan(
-            "\nObservation:"
-          )
-        );
-        console.log(
-          "Command execution failed."
-        );
-
-        console.log(
-          chalk.yellow(
-            "\nReflection:"
-          )
-        );
-        console.log(
-          "The command failed. Consider checking the path, command syntax, or file existence."
-        );
+        default:
+          console.log(
+            chalk.red("\nUnknown Tool")
+          );
+          continue;
       }
+
+      console.log(
+        chalk.green(
+          "\nCommand Output:\n"
+        )
+      );
+      console.log(output);
+
+      console.log(
+        chalk.cyan("\nObservation:")
+      );
+      console.log(
+        "Command executed successfully."
+      );
+    } catch (error) {
+      console.log(
+        chalk.red("\nError:\n")
+      );
+      console.log(error);
+
+      console.log(
+        chalk.cyan("\nObservation:")
+      );
+      console.log(
+        "Command execution failed."
+      );
+
+      console.log(
+        chalk.yellow("\nReflection:")
+      );
+      console.log(
+        "The command failed. Consider checking the path, command syntax, or file existence."
+      );
     }
   }
 
   rl.close();
 }
+const docs = [
+  "Java is a programming language",
+  "Spring Boot is used for backend development",
+  "React is used for frontend development",
+];
+for (const doc of docs) {
+  const embedding =
+    await createEmbedding(doc);
 
+  vectorStore.push({
+    text: doc,
+    embedding,
+  });
+}
+const results = await retrieve(
+  "What is used for backend development?"
+);
+
+console.log(results);
 main();
