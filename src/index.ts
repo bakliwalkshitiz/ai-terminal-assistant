@@ -1,7 +1,7 @@
 import readline from "readline";
 import chalk from "chalk";
 
-import { askAI } from "./ai.js";
+import { askAI , askRAG  } from "./ai.js";
 import { routeSource } from "./router.js";
 import { runCommand } from "./terminal.js";
 
@@ -248,5 +248,12 @@ const context =
     "What is used for backend development?"
   );
 
-console.log(context);
+const answer =
+  await askRAG(
+    "What is used for backend development?",
+    context
+  );
+
+console.log("\nAnswer:");
+console.log(answer);
 main();

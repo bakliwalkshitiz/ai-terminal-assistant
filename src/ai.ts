@@ -211,7 +211,7 @@ ${question}
     });
 
   return (
-    response.choices?.[0]?.message.content ??
-    ""
+    response.choices[0]
+      ?.message.content ?? ""
   );
 }
