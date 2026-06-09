@@ -5,7 +5,7 @@ import { askAI } from "./ai.js";
 import { routeSource } from "./router.js";
 import { runCommand } from "./terminal.js";
 
-import { retrieve } from "./retrieval.js";
+import {retrieve,buildContext} from "./retrieval.js";
 import { createEmbedding } from "./embedding.js";
 import { vectorStore } from "./vectorStore.js";
 
@@ -243,9 +243,10 @@ for (const doc of docs) {
     embedding,
   });
 }
-const results = await retrieve(
-  "What is used for backend development?"
-);
+const context =
+  await buildContext(
+    "What is used for backend development?"
+  );
 
-console.log(results);
+console.log(context);
 main();

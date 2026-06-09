@@ -31,3 +31,13 @@ export async function retrieve(
 
   return matches.slice(0, 3);
 }
+export async function buildContext(
+  query: string
+) {
+  const matches =
+    await retrieve(query);
+
+  return matches
+    .map((item) => item.text)
+    .join("\n");
+}
