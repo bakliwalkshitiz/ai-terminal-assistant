@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { askAI, askRAG } from "./ai.js";
 import { routeSource } from "./router.js";
 import { runCommand } from "./terminal.js";
-
+import { ingestFile } from "./ingest.js";
 import { buildContext } from "./retrieval.js";
 import { createEmbedding } from "./embedding.js";
 import { vectorStore } from "./vectorStore.js";
@@ -273,20 +273,8 @@ async function main() {
   rl.close();
 }
 
-const docs = [
-  "Java is a programming language",
-  "Spring Boot is used for backend development",
-  "React is used for frontend development",
-];
-
-for (const doc of docs) {
-  const embedding =
-    await createEmbedding(doc);
-
-  vectorStore.push({
-    text: doc,
-    embedding,
-  });
-}
+await ingestFile(
+  "memory.txt"
+);
 
 main();

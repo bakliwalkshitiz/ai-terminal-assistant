@@ -1,2 +1,11 @@
 Project Folder = ai-terminal
+
 Favorite Language = Java
+
+Spring Boot is used for backend development.
+
+React is used for frontend development.
+
+Java is a programming language.
+
+MongoDB is a NoSQL database.
