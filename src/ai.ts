@@ -163,6 +163,37 @@ User:
   "risk": "low",
   "explanation": "The answer can be generated directly."
 }
+  RAG RULES:
+
+Use source = "rag" when:
+- The question mentions:
+  knowledge base
+  stored documents
+  stored data
+  company data
+  internal information
+  according to documents
+  according to memory
+
+- The answer may exist in retrieved documents.
+
+Examples:
+
+Question:
+"What does my knowledge base say about backend development?"
+source: rag
+
+Question:
+"According to the stored documents, what is used for frontend development?"
+source: rag
+
+Question:
+"What is React?"
+source: llm
+
+Question:
+"What is the capital of France?"
+source: llm
 `,
       },
       {

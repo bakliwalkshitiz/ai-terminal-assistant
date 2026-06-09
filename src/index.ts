@@ -1,11 +1,11 @@
 import readline from "readline";
 import chalk from "chalk";
 
-import { askAI , askRAG  } from "./ai.js";
+import { askAI, askRAG } from "./ai.js";
 import { routeSource } from "./router.js";
 import { runCommand } from "./terminal.js";
 
-import {retrieve,buildContext} from "./retrieval.js";
+import { buildContext } from "./retrieval.js";
 import { createEmbedding } from "./embedding.js";
 import { vectorStore } from "./vectorStore.js";
 
@@ -63,7 +63,9 @@ async function main() {
       );
     } catch {
       console.log(
-        chalk.red("\nInvalid JSON Response")
+        chalk.red(
+          "\nInvalid JSON Response"
+        )
       );
       continue;
     }
@@ -76,8 +78,33 @@ async function main() {
       !response.command
     ) {
       console.log(
-        chalk.red("\nInvalid AI Response")
+        chalk.red(
+          "\nInvalid AI Response"
+        )
       );
+      continue;
+    }
+
+    if (
+      response.source === "rag"
+    ) {
+      const context =
+        await buildContext(input);
+
+      const ragAnswer =
+        await askRAG(
+          input,
+          context
+        );
+
+      console.log(
+        chalk.green(
+          "\nRAG Answer:\n"
+        )
+      );
+
+      console.log(ragAnswer);
+
       continue;
     }
 
@@ -164,9 +191,10 @@ async function main() {
 
       switch (response.tool) {
         case "terminal":
-          output = await runCommand(
-            response.command
-          );
+          output =
+            await runCommand(
+              response.command
+            );
           break;
 
         case "browser":
@@ -187,7 +215,9 @@ async function main() {
 
         default:
           console.log(
-            chalk.red("\nUnknown Tool")
+            chalk.red(
+              "\nUnknown Tool"
+            )
           );
           continue;
       }
@@ -197,30 +227,43 @@ async function main() {
           "\nCommand Output:\n"
         )
       );
+
       console.log(output);
 
       console.log(
-        chalk.cyan("\nObservation:")
+        chalk.cyan(
+          "\nObservation:"
+        )
       );
+
       console.log(
         "Command executed successfully."
       );
     } catch (error) {
       console.log(
-        chalk.red("\nError:\n")
+        chalk.red(
+          "\nError:\n"
+        )
       );
+
       console.log(error);
 
       console.log(
-        chalk.cyan("\nObservation:")
+        chalk.cyan(
+          "\nObservation:"
+        )
       );
+
       console.log(
         "Command execution failed."
       );
 
       console.log(
-        chalk.yellow("\nReflection:")
+        chalk.yellow(
+          "\nReflection:"
+        )
       );
+
       console.log(
         "The command failed. Consider checking the path, command syntax, or file existence."
       );
@@ -229,11 +272,13 @@ async function main() {
 
   rl.close();
 }
+
 const docs = [
   "Java is a programming language",
   "Spring Boot is used for backend development",
   "React is used for frontend development",
 ];
+
 for (const doc of docs) {
   const embedding =
     await createEmbedding(doc);
@@ -243,17 +288,5 @@ for (const doc of docs) {
     embedding,
   });
 }
-const context =
-  await buildContext(
-    "What is used for backend development?"
-  );
 
-const answer =
-  await askRAG(
-    "What is used for backend development?",
-    context
-  );
-
-console.log("\nAnswer:");
-console.log(answer);
 main();
