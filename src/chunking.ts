@@ -1,18 +1,12 @@
 export function chunkText(
-  text: string,
-  chunkSize: number = 100
+  text: string
 ): string[] {
-  const chunks: string[] = [];
-
-  for (
-    let i = 0;
-    i < text.length;
-    i += chunkSize
-  ) {
-    chunks.push(
-      text.slice(i, i + chunkSize)
+  return text
+    .split(/\r?\n\r?\n/)
+    .map(
+      (chunk) => chunk.trim()
+    )
+    .filter(
+      (chunk) => chunk.length > 0
     );
-  }
-
-  return chunks;
 }

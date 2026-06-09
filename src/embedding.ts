@@ -16,5 +16,5 @@ export async function createEmbedding(
       input: text,
     });
 
-  return response.data[0].embedding;
+  return response.data?.[0]?.embedding ?? [];
 }

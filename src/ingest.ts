@@ -15,14 +15,14 @@ export async function ingestFile(
   const chunks =
     chunkText(content);
 
-  for (const chunk of chunks) {
-    const embedding =
-      await createEmbedding(
-        chunk
-      );
+  for (const [index, chunk] of chunks.entries()) {
+    const embedding = await createEmbedding(chunk);
 
     vectorStore.push({
+      id: `chunk-${index + 1}`,
       text: chunk,
+      source: filePath,
+      chunkNumber: index + 1,
       embedding,
     });
   }
